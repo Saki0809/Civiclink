@@ -1,0 +1,287 @@
+/* Dashboard Styles */
+
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Quick Actions */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+@media (max-width: 480px) {
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+.action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--gray-50);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  color: var(--gray-700);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  border: 1px solid var(--gray-100);
+  position: relative;
+  overflow: hidden;
+}
+
+.action-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.action-card:hover::before {
+  opacity: 1;
+}
+
+.action-card svg {
+  width: 28px;
+  height: 28px;
+}
+
+.action-card span {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.action-card.healthcare {
+  background: linear-gradient(160deg, var(--healthcare-light) 0%, var(--gray-50) 60%);
+  border-left: 4px solid var(--healthcare-color);
+}
+.action-card.healthcare::before { background: linear-gradient(90deg, var(--healthcare-color), #34d399); }
+.action-card.healthcare:hover { box-shadow: 0 12px 24px -6px rgba(16, 185, 129, 0.2); border-color: var(--healthcare-color); }
+.action-card.healthcare svg { color: var(--healthcare-color); }
+
+.action-card.municipal {
+  background: linear-gradient(160deg, var(--municipal-light) 0%, var(--gray-50) 60%);
+  border-left: 4px solid var(--municipal-color);
+}
+.action-card.municipal::before { background: linear-gradient(90deg, var(--municipal-color), #fbbf24); }
+.action-card.municipal:hover { box-shadow: 0 12px 24px -6px rgba(245, 158, 11, 0.2); border-color: var(--municipal-color); }
+.action-card.municipal svg { color: var(--municipal-color); }
+
+.action-card.education {
+  background: linear-gradient(160deg, var(--education-light) 0%, var(--gray-50) 60%);
+  border-left: 4px solid var(--education-color);
+}
+.action-card.education::before { background: linear-gradient(90deg, var(--education-color), #a78bfa); }
+.action-card.education:hover { box-shadow: 0 12px 24px -6px rgba(139, 92, 246, 0.2); border-color: var(--education-color); }
+.action-card.education svg { color: var(--education-color); }
+
+.action-card.chat {
+  background: linear-gradient(160deg, var(--primary-50) 0%, var(--gray-50) 60%);
+  border-left: 4px solid var(--primary-500);
+}
+.action-card.chat::before { background: linear-gradient(90deg, var(--primary-500), #60a5fa); }
+.action-card.chat:hover { box-shadow: 0 12px 24px -6px rgba(59, 130, 246, 0.2); border-color: var(--primary-500); }
+.action-card.chat svg { color: var(--primary-500); }
+
+/* Dashboard Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dashboard Section */
+.dashboard-section {
+  background: var(--gray-50);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.section-header h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--gray-900);
+}
+
+.section-link {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--primary-600);
+}
+
+.section-link:hover {
+  text-decoration: underline;
+}
+
+/* Opportunities List */
+.opportunities-list {
+  padding: var(--spacing-md);
+}
+
+.opportunity-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.opportunity-item:hover {
+  background: var(--gray-100);
+}
+
+.opp-indicator {
+  width: 4px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+}
+
+.opp-indicator.healthcare { background: var(--healthcare-color); }
+.opp-indicator.municipal { background: var(--municipal-color); }
+.opp-indicator.education { background: var(--education-color); }
+
+.opp-content {
+  flex: 1;
+}
+
+.opp-content h4 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-900);
+  margin-bottom: var(--spacing-xs);
+}
+
+.opp-content p {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+}
+
+.opp-date {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.75rem;
+  color: var(--gray-400);
+}
+
+/* Domain Overview */
+.domain-overview {
+  padding: var(--spacing-lg);
+}
+
+.domain-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+}
+
+.domain-card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-xl);
+  background: var(--gray-50);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  border: 1px solid var(--gray-200);
+  transition: all var(--transition-normal);
+}
+
+.domain-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.domain-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.domain-card-header h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.domain-card p {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  margin-bottom: var(--spacing-lg);
+  flex: 1;
+}
+
+.domain-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  font-size: 0.75rem;
+  color: var(--gray-500);
+}
+
+.domain-stats span {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* Domain-specific colors */
+.domain-card.healthcare {
+  border-top: 3px solid var(--healthcare-color);
+}
+.domain-card.healthcare svg { color: var(--healthcare-color); }
+.domain-card.healthcare h3 { color: var(--healthcare-color); }
+.domain-card.healthcare:hover { border-color: var(--healthcare-color); }
+
+.domain-card.municipal {
+  border-top: 3px solid var(--municipal-color);
+}
+.domain-card.municipal svg { color: var(--municipal-color); }
+.domain-card.municipal h3 { color: var(--municipal-color); }
+.domain-card.municipal:hover { border-color: var(--municipal-color); }
+
+.domain-card.education {
+  border-top: 3px solid var(--education-color);
+}
+.domain-card.education svg { color: var(--education-color); }
+.domain-card.education h3 { color: var(--education-color); }
+.domain-card.education:hover { border-color: var(--education-color); }
+
+/* Dashboard Section Padding */
+.dashboard-section.domain-overview .domain-cards {
+  padding: 0;
+}

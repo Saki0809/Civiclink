@@ -1,0 +1,909 @@
+/* --- Healthcare Premium Redesign --- */
+
+.healthcare-dashboard, .form-page {
+  --hc-primary: #16a34a;
+  --hc-primary-soft: rgba(22, 163, 74, 0.1);
+  --hc-secondary: #064e3b;
+  --hc-accent: #f43f5e;
+  --hc-bg-gradient: radial-gradient(circle at 0% 0%, var(--gray-50) 0%, var(--gray-100) 100%);
+  --glass: var(--gray-50);
+  --glass-border: var(--gray-200);
+  --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+  background: var(--hc-bg-gradient);
+  min-height: 100vh;
+}
+
+/* Glass Header */
+.healthcare-dashboard .page-header, .form-header {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 1.5rem 2.5rem;
+  margin: 0 0 2.5rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.healthcare-dashboard .page-title, .form-header h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--hc-secondary), var(--hc-primary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.05em;
+  margin: 0;
+}
+
+.healthcare-dashboard .page-description, .form-header p {
+  color: var(--gray-500);
+  font-size: 0.95rem;
+  margin-top: 4px;
+}
+
+/* Premium Navigation Elements */
+.back-btn, .btn-back {
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  color: var(--gray-500);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  cursor: pointer;
+}
+
+.back-btn:hover, .btn-back:hover {
+  background: var(--hc-primary);
+  color: white;
+  transform: translateX(-4px);
+  border-color: var(--hc-primary);
+}
+
+/* Dashboard List - Horizontal Cards */
+.camps-list, .issues-list, .jobs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.camp-card-horizontal {
+  background: var(--gray-50);
+  border-radius: 2rem;
+  padding: 1.5rem 2rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 2rem;
+  text-decoration: none;
+  border: 1px solid var(--gray-100);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: var(--card-shadow);
+}
+
+.camp-card-horizontal:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--card-shadow-hover);
+  border-color: var(--hc-primary);
+}
+
+.camp-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camp-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--hc-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.camp-organizer {
+  font-size: 0.875rem;
+  color: var(--hc-primary);
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.camp-meta {
+  display: flex;
+  gap: 1.5rem;
+  color: var(--gray-500);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.camp-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.camp-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.camp-status.open { background: #f0fdf4; color: #166534; }
+.camp-status.filling { background: #fff7ed; color: #9a3412; }
+
+.camp-progress {
+  margin-top: 1rem;
+  max-width: 300px;
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--gray-100);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--hc-primary);
+  transition: width 0.6s ease;
+}
+
+.progress-text {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  font-weight: 600;
+}
+
+/* Premium Forms Redesign */
+.domain-form, .volunteer-form {
+  max-width: 900px;
+  margin: 0 auto 4rem auto;
+  padding: 0 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.form-section {
+  background: var(--gray-50);
+  padding: 2.5rem;
+  border-radius: 2.5rem;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--gray-200);
+}
+
+.form-section h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--hc-secondary);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-left: 4px solid var(--hc-primary);
+  padding-left: 1rem;
+  margin-left: -2.5rem;
+}
+
+.form-grid, .form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.form-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--gray-600);
+}
+
+.form-input, .form-textarea, .form-select, .form-group input, .form-group select, .form-group textarea {
+  background: var(--gray-100);
+  border: 2px solid var(--gray-200);
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  font-size: 0.95rem;
+  transition: all 0.3s;
+  color: var(--hc-secondary);
+  font-family: inherit;
+}
+
+.form-input:focus, .form-textarea:focus, .form-group input:focus, .form-group textarea:focus {
+  background: white;
+  border-color: var(--hc-primary);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+}
+
+.checkbox-grid, .skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.checkbox-item, .radio-option, .skill-tag {
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  padding: 0.75rem 1.25rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.2s;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--gray-500);
+}
+
+.checkbox-item:has(input:checked), .radio-option:has(input:checked), .skill-tag.selected {
+  background: var(--hc-primary-soft);
+  border-color: var(--hc-primary);
+  color: var(--hc-primary);
+}
+
+.skill-tag { border: none; }
+
+.form-actions-footer, .form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 2rem;
+  padding: 2.5rem;
+  background: var(--hc-secondary);
+  border-radius: 2.5rem;
+  color: white;
+}
+
+.form-actions-footer .actions, .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.5rem;
+}
+
+/* Success Pages */
+.success-page, .success-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 2.5rem;
+}
+
+.success-card, .success-container {
+  background: var(--gray-50);
+  padding: 4rem;
+  border-radius: 3rem;
+  text-align: center;
+  max-width: 600px;
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.success-icon {
+  width: 100px;
+  height: 100px;
+  background: #f0fdf4;
+  color: #166534;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.success-card h2 {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--hc-secondary);
+}
+
+.btn-healthcare, .healthcare-dashboard .btn-primary, .healthcare-dashboard .register-btn {
+  background: var(--hc-primary);
+  color: white !important;
+  padding: 1rem 2rem;
+  border-radius: 1.25rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.healthcare-dashboard .btn-primary:hover, .healthcare-dashboard .register-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(22, 163, 74, 0.3);
+  filter: brightness(1.1);
+}
+
+.healthcare-dashboard .btn-outline {
+  background: transparent;
+  color: var(--hc-primary) !important;
+  border: 2px solid var(--hc-primary);
+  padding: 1rem 2rem;
+  border-radius: 1.25rem;
+  font-weight: 800;
+  transition: all 0.3s;
+}
+
+.healthcare-dashboard .btn-outline:hover {
+  background: var(--hc-primary);
+  color: white !important;
+}
+
+.healthcare-dashboard .btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  border-radius: 0.75rem;
+}
+
+.btn-book-premium {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: #ffffff;
+  padding: 0.85rem 1.75rem;
+  border-radius: 12px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+  font-size: 0.9rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-book-premium:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 16px rgba(13, 148, 136, 0.35);
+  filter: brightness(1.1);
+}
+
+.btn-book-premium:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-book-premium:disabled {
+  background: var(--gray-300);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-book-premium .loading-spinner {
+  animation: hc-spin 1s linear infinite;
+}
+
+@keyframes hc-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Appointment Ticket Success View */
+.booking-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+  animation: hc-fade-in 0.3s ease;
+}
+
+.appointment-ticket {
+  background: white;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 2.5rem;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+[data-theme='dark'] .appointment-ticket {
+  background: var(--gray-900);
+  border: 1px solid var(--gray-800);
+}
+
+.ticket-header {
+  background: linear-gradient(135deg, var(--hc-primary), var(--hc-secondary));
+  color: white;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  position: relative;
+}
+
+.ticket-success-icon {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  border: 2px solid white;
+}
+
+.ticket-header h2 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+}
+
+.ticket-header p {
+  opacity: 0.9;
+  font-size: 0.9rem;
+}
+
+.ticket-body {
+  padding: 2.5rem 2rem;
+  position: relative;
+}
+
+.ticket-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.ticket-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--gray-200);
+  padding-bottom: 0.75rem;
+}
+
+[data-theme='dark'] .ticket-row {
+  border-bottom-color: var(--gray-800);
+}
+
+.ticket-label {
+  color: var(--gray-500);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.ticket-value {
+  color: var(--hc-secondary);
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+[data-theme='dark'] .ticket-value {
+  color: white;
+}
+
+.ticket-qr-placeholder {
+  width: 120px;
+  height: 120px;
+  background: var(--gray-100);
+  margin: 2rem auto 0;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-400);
+  border: 2px solid var(--gray-200);
+}
+
+[data-theme='dark'] .ticket-qr-placeholder {
+  background: var(--gray-800);
+  border-color: var(--gray-700);
+}
+
+.ticket-footer {
+  padding: 1.5rem 2rem 2.5rem;
+}
+
+.ticket-close-btn {
+  width: 100%;
+  background: var(--gray-100);
+  color: var(--gray-900);
+  border: none;
+  padding: 1.25rem;
+  border-radius: 1.25rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+[data-theme='dark'] .ticket-close-btn {
+  background: var(--gray-800);
+  color: white;
+}
+
+.ticket-close-btn:hover {
+  background: var(--gray-200);
+}
+
+@keyframes hc-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.btn-lg {
+  padding: 1.25rem 2.5rem;
+  font-size: 1.125rem;
+}
+
+/* Feature Specific Enhancements */
+.blood-badge {
+  padding: 0.4rem 1rem;
+  border-radius: 1rem;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.blood-badge.critical { 
+  background: #fef2f2; color: #991b1b;
+  animation: hc-pulse 2s infinite;
+}
+
+@keyframes hc-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 2.5rem;
+  padding: 0 2.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.dashboard-card {
+  background: var(--gray-50);
+  padding: 2rem;
+  border-radius: 2rem;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--gray-200);
+}
+
+/* Find Doctors Specific Styles */
+.doctor-card {
+  border-left: 4px solid var(--hc-primary);
+}
+
+.doctor-avatar {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 1.5rem;
+  background: linear-gradient(135deg, var(--hc-primary), var(--hc-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.75rem;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+}
+
+.tele-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--hc-accent);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--gray-50);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.dr-specialty {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--hc-primary);
+  margin-bottom: 0.75rem;
+}
+
+.rating-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--gray-100);
+  padding: 0.35rem 0.75rem;
+  border-radius: 99px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--gray-900);
+}
+
+.review-count {
+  color: var(--gray-500);
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+.dr-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.specialty-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.specialty-item {
+  padding: 0.6rem 1.25rem;
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.specialty-item:hover, .specialty-item.active {
+  background: var(--hc-primary);
+  color: white;
+  border-color: var(--hc-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+}
+
+/* High Contrast Fixes */
+[data-theme='dark'] .healthcare-dashboard .page-description,
+[data-theme='dark'] .dr-specialty,
+[data-theme='dark'] .camp-meta span,
+[data-theme='dark'] .progress-text {
+  color: var(--gray-400); /* Brighter for dark mode visibility */
+}
+
+[data-theme='dark'] .rating-badge {
+  background: var(--gray-800);
+  color: var(--gray-100);
+}
+
+[data-theme='dark'] .specialty-item {
+  background: var(--gray-800);
+  border-color: var(--gray-700);
+  color: var(--gray-300);
+}
+
+[data-theme='dark'] .specialty-item:hover,
+[data-theme='dark'] .specialty-item.active {
+  background: var(--hc-primary);
+  color: white;
+}
+
+/* Vaccination Center Page Styles */
+.vaccine-grid-header {
+  margin-bottom: var(--spacing-lg);
+}
+
+.vaccine-cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.vaccine-card {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 2rem;
+  padding: 2rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.vaccine-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1);
+  border-color: var(--hc-primary);
+}
+
+.vaccine-icon {
+  width: 56px;
+  height: 56px;
+  background: var(--hc-primary-light);
+  color: var(--hc-primary);
+  border-radius: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.vaccine-card h4 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.v-dose {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--hc-secondary);
+  background: var(--gray-100);
+  padding: 0.35rem 0.75rem;
+  border-radius: 99px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.v-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.v-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.v-badge.high { background: #dcfce7; color: #15803d; }
+.v-badge.limited { background: #fef9c3; color: #a16207; }
+.v-badge.eligibility { background: var(--gray-100); color: var(--gray-600); }
+
+.v-footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--gray-100);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.v-coverage {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--gray-700);
+}
+
+.slot-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.slot-count {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--hc-primary);
+}
+
+.cert-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--gray-100);
+  border-radius: 1.25rem;
+  margin-top: 1rem;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.cert-item:hover {
+  background: var(--gray-200);
+  transform: translateX(4px);
+}
+
+.cert-info {
+  flex: 1;
+}
+
+.cert-info strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--gray-900);
+}
+
+.cert-info p {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  margin: 0;
+}
+
+/* Dark Mode Adjustments for Vaccination */
+[data-theme='dark'] .vaccine-card {
+  background: var(--gray-800);
+  border-color: var(--gray-700);
+}
+
+[data-theme='dark'] .v-dose {
+  background: var(--gray-700);
+  color: var(--hc-primary);
+}
+
+[data-theme='dark'] .v-badge.eligibility {
+  background: var(--gray-700);
+  color: var(--gray-400);
+}
+
+[data-theme='dark'] .v-badge.high { background: rgba(22, 163, 74, 0.2); color: #4ade80; }
+[data-theme='dark'] .v-badge.limited { background: rgba(202, 138, 4, 0.2); color: #facc15; }
+
+[data-theme='dark'] .cert-item {
+  background: var(--gray-800);
+}
+
+[data-theme='dark'] .cert-item:hover {
+  background: var(--gray-700);
+}
+
+[data-theme='dark'] .v-footer {
+  border-top-color: var(--gray-700);
+}
