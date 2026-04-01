@@ -171,3 +171,16 @@ async def add_issue_comment(
         user_name=user.full_name,
         user_role=user.role.value
     )
+
+
+@router.post("/issues/seed", response_model=MunicipalIssueList)
+async def seed_issues(
+    user: UserProfile = Depends(get_current_user)
+):
+    """Seed mock municipal issues for the current user."""
+    issues = await municipal_service.seed_mock_issues(
+        user_id=user.id,
+        user_name=user.full_name,
+        user_phone=user.phone
+    )
+    return MunicipalIssueList(issues=issues, total=len(issues))

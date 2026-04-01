@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../core/auth/AuthContext';
 import { 
   Syringe, Search, MapPin, ChevronLeft, 
   Calendar, Clock, ShieldCheck, AlertCircle, 
@@ -10,7 +11,9 @@ import './Healthcare.css';
 
 export function VaccinationPage() {
   const navigate = useNavigate();
-  const [bookingState, setBookingState] = useState('idle'); // 'idle' | 'booking' | 'success'
+  const { user } = useAuth();
+  const isInstitution = ['hospital_admin', 'medical_ngo', 'health_department'].includes(user?.role);
+  const [bookingState, setBookingState] = useState('idle');
   const [activeCenter, setActiveCenter] = useState(null);
 
   const vaccines = [
@@ -43,7 +46,7 @@ export function VaccinationPage() {
           </button>
           <div>
             <h1 className="page-title">Vaccination Center</h1>
-            <p className="page-description">Schedule and manage your immunizations</p>
+            <p className="page-description">{isInstitution ? 'Manage vaccine inventory, slots, and center operations' : 'Schedule and manage your immunizations'}</p>
           </div>
         </div>
       </div>
@@ -74,7 +77,7 @@ export function VaccinationPage() {
           </div>
 
           <div className="section-header mt-xl">
-            <h2>Nearby Centers</h2>
+            <h2>{isInstitution ? 'Your Centers' : 'Nearby Centers'}</h2>
           </div>
           <div className="centers-list">
             {centers.map(center => (
@@ -91,23 +94,30 @@ export function VaccinationPage() {
                 </div>
                 <div className="slot-info">
                   <span className="slot-count">{center.slots} Slots</span>
-                  <button 
-                    className="btn-book-premium"
-                    onClick={() => handleBookSlot(center)}
-                    disabled={bookingState === 'booking'}
-                  >
-                    {bookingState === 'booking' && activeCenter?.id === center.id ? (
-                      <>
-                        <Clock size={18} className="loading-spinner" />
-                        Booking...
-                      </>
-                    ) : (
-                      <>
-                        <Calendar size={18} />
-                        Book Slot
-                      </>
-                    )}
-                  </button>
+                  {isInstitution ? (
+                    <button className="btn-book-premium">
+                      <Calendar size={18} />
+                      Manage Slots
+                    </button>
+                  ) : (
+                    <button 
+                      className="btn-book-premium"
+                      onClick={() => handleBookSlot(center)}
+                      disabled={bookingState === 'booking'}
+                    >
+                      {bookingState === 'booking' && activeCenter?.id === center.id ? (
+                        <>
+                          <Clock size={18} className="loading-spinner" />
+                          Booking...
+                        </>
+                      ) : (
+                        <>
+                          <Calendar size={18} />
+                          Book Slot
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -115,22 +125,49 @@ export function VaccinationPage() {
         </div>
 
         <div className="sidebar-content">
-          <div className="dashboard-card status-card">
-            <h3>Your Certificates</h3>
-            <div className="cert-item">
-              <CheckCircle size={18} color="var(--success-color)" />
-              <div className="cert-info">
-                <strong>COVID-19 Full</strong>
-                <p>Generated on Jan 12, 2026</p>
+          {isInstitution ? (
+            <>
+              <div className="dashboard-card status-card">
+                <h3>Vaccine Stock</h3>
+                <div className="cert-item">
+                  <Syringe size={18} color="var(--success-color)" />
+                  <div className="cert-info">
+                    <strong>COVID-19 Booster</strong>
+                    <p>1,240 doses available</p>
+                  </div>
+                </div>
+                <div className="cert-item">
+                  <Syringe size={18} color="var(--warning-color)" />
+                  <div className="cert-info">
+                    <strong>Influenza</strong>
+                    <p>83 doses — restock soon</p>
+                  </div>
+                </div>
               </div>
-              <ChevronRight size={16} />
-            </div>
-          </div>
-
-          <div className="dashboard-card help-card">
-            <h3>Need Help?</h3>
-            <p className="help-text">Contact the National Health Helpline at 1075 for vaccination queries.</p>
-          </div>
+              <div className="dashboard-card help-card">
+                <h3>Admin Actions</h3>
+                <p className="help-text">Update vaccine stock, add new slots, or schedule new drives from your admin panel.</p>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="dashboard-card status-card">
+                <h3>Your Certificates</h3>
+                <div className="cert-item">
+                  <CheckCircle size={18} color="var(--success-color)" />
+                  <div className="cert-info">
+                    <strong>COVID-19 Full</strong>
+                    <p>Generated on Jan 12, 2026</p>
+                  </div>
+                  <ChevronRight size={16} />
+                </div>
+              </div>
+              <div className="dashboard-card help-card">
+                <h3>Need Help?</h3>
+                <p className="help-text">Contact the National Health Helpline at 1075 for vaccination queries.</p>
+              </div>
+            </>
+          )}
         </div>
       </div>
 

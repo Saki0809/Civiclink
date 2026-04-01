@@ -287,6 +287,60 @@ class MunicipalService:
             created_at=datetime.utcnow()
         )
     
+    async def seed_mock_issues(self, user_id: str, user_name: str, user_phone: Optional[str] = None) -> List[MunicipalIssue]:
+        """Seed a set of mock issues for a user for demonstration purposes."""
+        mock_data = [
+            {
+                "title": "Road Repair - MG Road", "category": IssueCategory.ROADS, "priority": IssuePriority.HIGH,
+                "location_name": "Main Intersection", "address": "123 MG Road, Sector 12", "locality": "Sector 12",
+                "description": "Large potholes reported near the main intersection. High traffic area.", "status": IssueStatus.IN_PROGRESS
+            },
+            {
+                "title": "Street Light Failure", "category": IssueCategory.STREET_LIGHTS, "priority": IssuePriority.MEDIUM,
+                "location_name": "Clock Tower", "address": "Market Square, Old Town", "locality": "Old Town",
+                "description": "Three street lights not working in row near the clock tower.", "status": IssueStatus.SUBMITTED
+            },
+            {
+                "title": "Garbage Overflow", "category": IssueCategory.GARBAGE, "priority": IssuePriority.CRITICAL,
+                "location_name": "Block C Collection Point", "address": "Lane 4, Block C", "locality": "Block C",
+                "description": "Main garbage collection point has not been cleared for 3 days.", "status": IssueStatus.ACKNOWLEDGED
+            }
+        ]
+        
+        created_issues = []
+        for data in mock_data:
+            issue_id = str(uuid.uuid4())
+            now = datetime.utcnow().isoformat()
+            
+            payload = {
+                "id": issue_id,
+                "citizen_id": user_id,
+                "citizen_name": user_name,
+                "citizen_phone": user_phone,
+                "title": data["title"],
+                "description": data["description"],
+                "category": data["category"].value,
+                "location_name": data["location_name"],
+                "address": data["address"],
+                "locality": data["locality"],
+                "status": data["status"].value,
+                "priority": data["priority"].value,
+                "created_at": now,
+                "updated_at": now
+            }
+            
+            self.client.table("municipal_issues").insert(payload).execute()
+            
+            # Initial timeline
+            await self._add_timeline_entry(
+                issue_id=issue_id, user_id=user_id, user_name=user_name,
+                user_role="citizen", message="Mock issue seeded for demo", new_status=data["status"]
+            )
+            
+            created_issues.append(self._parse_issue(payload))
+            
+        return created_issues
+
     def _parse_issue(self, item: dict) -> MunicipalIssue:
         return MunicipalIssue(
             id=item["id"],

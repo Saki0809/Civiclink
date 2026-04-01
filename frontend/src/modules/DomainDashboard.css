@@ -60,7 +60,8 @@
   background: white;
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
-  transition: transform var(--transition-fast);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--gray-100);
 }
 
 .stat-card:hover {
@@ -363,22 +364,63 @@
   color: var(--gray-400);
 }
 
-/* Tips Card */
-.tips-card {
-  color: white;
+/* Tips Card - Premium Glass/Gradient Fix */
+.dashboard-card.tips-card {
+  border: none;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dashboard-card.tips-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
 }
 
 .tips-card.healthcare {
-  background: linear-gradient(135deg, var(--healthcare-color) 0%, #34d399 100%);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
 }
 
 .tips-card.municipal {
-  background: linear-gradient(135deg, var(--municipal-color) 0%, #60a5fa 100%);
+  background: linear-gradient(135deg, var(--municipal-color) 0%, #ea580c 100%) !important;
 }
 
 .tips-card.education {
-  background: linear-gradient(135deg, var(--education-color) 0%, #a78bfa 100%);
+  background: linear-gradient(135deg, var(--education-color) 0%, #ca8a04 100%) !important;
 }
+
+.tips-card .card-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 1.25rem !important;
+  padding-bottom: 0.75rem !important;
+}
+
+.tips-card h3 {
+  color: white !important;
+  font-weight: 800 !important;
+  font-size: 1.1rem !important;
+  letter-spacing: -0.02em;
+}
+
+.tips-card .card-header svg {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tip-content p {
+  color: rgba(255, 255, 255, 0.95) !important;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.tip-content strong {
+  color: white !important;
+  font-weight: 800;
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 1.1rem;
+}
+
 
 .tips-card h3,
 .tips-card .card-header h3 {

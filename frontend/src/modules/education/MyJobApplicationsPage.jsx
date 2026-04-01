@@ -1,83 +1,93 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { GraduationCap, MapPin, Clock, CheckCircle, XCircle, Loader, Calendar, Briefcase, Eye, FileText } from 'lucide-react';
+import { useAuth } from '../../core/auth/AuthContext';
+import { supabase } from '../../core/api/supabaseClient';
+import { GraduationCap, MapPin, Clock, CheckCircle, XCircle, Loader, Calendar, Briefcase, Eye, FileText, ArrowRight } from 'lucide-react';
 import '../DomainDashboard.css';
 import './Education.css';
 
 export function MyJobApplicationsPage() {
+  const { user } = useAuth();
   const [filter, setFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [myApplications, setMyApplications] = useState([]);
 
-  // Dummy data for user's job applications
-  const myApplications = [
-    { 
-      id: 1, 
-      jobTitle: 'Software Developer Intern', 
-      institution: 'Tech Academy',
-      type: 'internship',
-      location: 'Remote',
-      appliedAt: '2026-02-01',
-      status: 'shortlisted',
-      salary: '₹15,000 - ₹20,000/month',
-      nextStep: 'Technical Interview scheduled for Feb 10, 2026 at 11:00 AM',
-      interviewLink: 'https://meet.example.com/abc123'
-    },
-    { 
-      id: 2, 
-      jobTitle: 'Content Writer', 
-      institution: 'Digital Media House',
-      type: 'full_time',
-      location: 'New Town',
-      appliedAt: '2026-02-03',
-      status: 'under_review',
-      salary: '₹25,000 - ₹35,000/month',
-      nextStep: null
-    },
-    { 
-      id: 3, 
-      jobTitle: 'Mathematics Teacher', 
-      institution: 'City Public School',
-      type: 'full_time',
-      location: 'Sector 15',
-      appliedAt: '2026-01-28',
-      status: 'rejected',
-      salary: '₹35,000 - ₹45,000/month',
-      rejectionReason: 'We have selected another candidate whose experience better matches our requirements.'
-    },
-    { 
-      id: 4, 
-      jobTitle: 'Research Assistant', 
-      institution: 'National University',
-      type: 'part_time',
-      location: 'Campus',
-      appliedAt: '2026-02-04',
-      status: 'applied',
-      salary: '₹18,000 - ₹25,000/month',
-      nextStep: null
-    },
-    { 
-      id: 5, 
-      jobTitle: 'Data Entry Operator', 
-      institution: 'Municipal Corporation',
-      type: 'contract',
-      location: 'Park Avenue',
-      appliedAt: '2026-01-20',
-      status: 'hired',
-      salary: '₹12,000 - ₹15,000/month',
-      startDate: '2026-02-01',
-      nextStep: 'Congratulations! Report to HR on your start date with documents.'
-    },
-    { 
-      id: 6, 
-      jobTitle: 'Merit Scholarship 2026', 
-      institution: 'Education Foundation',
-      type: 'scholarship',
-      location: 'Online',
-      appliedAt: '2026-01-25',
-      status: 'approved',
-      salary: 'Up to ₹1,00,000/year',
-      nextStep: 'Scholarship approved! Amount will be credited to your registered bank account.'
+  useEffect(() => {
+    async function fetchApplications() {
+      if (!user) return;
+      
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('job_applications')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('applied_at', { ascending: false });
+
+        if (error) throw error;
+
+        // 1. Map database fields to UI fields
+        const formattedDbApps = (data || []).map(app => ({
+          id: app.id,
+          jobTitle: app.job_title,
+          institution: app.institution,
+          type: app.job_type,
+          location: app.location,
+          appliedAt: app.created_at,
+          status: app.status || 'applied',
+          salary: app.salary || 'Not specified',
+          nextStep: app.status === 'shortlisted' ? 'Technical Interview scheduled' : null,
+        }));
+
+        // 2. Load Local Storage Applications
+        const localApps = JSON.parse(localStorage.getItem('local_job_applications') || '[]')
+          .filter(a => !user || a.user_id === user.id)
+          .map(app => ({
+            ...app,
+            jobTitle: app.job_title,
+            appliedAt: app.appliedAt,
+            status: app.status || 'applied',
+          }));
+
+        // 3. Baseline Mock Data
+        const baselineApps = [
+          { 
+            id: 'b-app-1', 
+            jobTitle: 'Software Developer Intern', 
+            institution: 'Tech Academy', 
+            type: 'internship', 
+            location: 'Remote', 
+            appliedAt: new Date(Date.now() - 432000000).toISOString(), 
+            status: 'shortlisted', 
+            salary: '₹15,000 - ₹20,000/month',
+            nextStep: 'Technical Interview scheduled'
+          },
+          { 
+            id: 'b-app-2', 
+            jobTitle: 'Library Assistant', 
+            institution: 'Town Library', 
+            type: 'part_time', 
+            location: 'Old Port', 
+            appliedAt: new Date(Date.now() - 864000000).toISOString(), 
+            status: 'under_review', 
+            salary: '₹12,000/month'
+          }
+        ];
+
+        // 4. Merge all
+        const combined = [...localApps, ...formattedDbApps, ...baselineApps]
+          .sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt));
+
+        setMyApplications(combined);
+      } catch (err) {
+        console.error('Error fetching applications:', err);
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+
+    fetchApplications();
+  }, [user]);
 
   const statusConfig = {
     applied: { label: 'Applied', color: 'var(--gray-500)', icon: Clock },
@@ -167,7 +177,12 @@ export function MyJobApplicationsPage() {
 
       {/* Applications List */}
       <div className="job-applications-list">
-        {filteredApplications.map(app => {
+        {loading ? (
+          <div className="loading-state">
+            <Loader size={40} className="spin" />
+            <p>Fetching your applications...</p>
+          </div>
+        ) : filteredApplications.map(app => {
           const StatusIcon = statusConfig[app.status].icon;
           
           return (
@@ -264,18 +279,19 @@ export function MyJobApplicationsPage() {
             </div>
           );
         })}
+        {!loading && filteredApplications.length === 0 && (
+          <div className="empty-state">
+            <GraduationCap size={48} />
+            <h3>No applications found</h3>
+            <p>You haven't applied for any jobs in this category yet.</p>
+            <Link to="/education/jobs/apply" className="btn btn-primary">
+              Browse Jobs
+            </Link>
+          </div>
+        )}
       </div>
 
-      {filteredApplications.length === 0 && (
-        <div className="empty-state">
-          <GraduationCap size={48} />
-          <h3>No applications found</h3>
-          <p>You haven't applied for any jobs in this category yet.</p>
-          <Link to="/education/jobs/apply" className="btn btn-primary">
-            Browse Jobs
-          </Link>
-        </div>
-      )}
+      {/* Removed separate empty state check as it's now handled inside the list container */}
     </div>
   );
 }

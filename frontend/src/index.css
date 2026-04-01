@@ -17,13 +17,13 @@
   --primary-900: #1e3a8a;
 
   /* Domain Colors */
-  --healthcare-color: #10b981;
-  --healthcare-light: #d1fae5;
-  --municipal-color: #f59e0b;
-  --municipal-light: #fef3c7;
-  --education-color: #8b5cf6;
-  --education-light: #ede9fe;
-  --civilian-color: #3b82f6;
+  --healthcare-color: #16a34a;
+  --healthcare-light: #dcfce7;
+  --municipal-color: #ea580c;
+  --municipal-light: #fff7ed;
+  --education-color: #ca8a04;
+  --education-light: #fef9c3;
+  --civilian-color: #2563eb;
   --civilian-light: #dbeafe;
 
   /* Status Colors */
@@ -266,7 +266,7 @@ a:hover {
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
   overflow: hidden;
-  transition: all var(--transition-normal);
+  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .card:hover {
@@ -615,7 +615,21 @@ a:hover {
    DARK MODE
    ================================================ */
 html {
-  transition: background-color 0.3s, color 0.3s;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Smooth transitions for all theme-affected elements */
+body,
+.sidebar,
+.card,
+.stat-card,
+.dashboard-card,
+.quick-action-card,
+.layout-header,
+input,
+textarea,
+select {
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 [data-theme="dark"] {

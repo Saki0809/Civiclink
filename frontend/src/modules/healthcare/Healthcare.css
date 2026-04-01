@@ -238,7 +238,7 @@
   background: white;
   border-color: var(--hc-primary);
   outline: none;
-  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
 }
 
 .checkbox-grid, .skills-grid {
@@ -383,7 +383,7 @@
   justify-content: center;
   gap: 0.6rem;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
   font-size: 0.9rem;
   position: relative;
   overflow: hidden;
@@ -391,7 +391,7 @@
 
 .btn-book-premium:hover:not(:disabled) {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 16px rgba(13, 148, 136, 0.35);
+  box-shadow: 0 8px 16px rgba(22, 163, 74, 0.35);
   filter: brightness(1.1);
 }
 
@@ -634,7 +634,7 @@
   color: white;
   font-size: 1.75rem;
   font-weight: 800;
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
 }
 
 .tele-badge {
@@ -708,7 +708,7 @@
   color: white;
   border-color: var(--hc-primary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
 }
 
 /* High Contrast Fixes */
@@ -906,4 +906,205 @@
 
 [data-theme='dark'] .v-footer {
   border-top-color: var(--gray-700);
+}
+/* --- Healthcare Modal Styles --- */
+.hc-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+  animation: hc-modal-fadeIn 0.3s ease-out;
+}
+
+.hc-modal-content {
+  background: white;
+  border-radius: 2.5rem;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--gray-100);
+  padding: 2.5rem;
+  animation: hc-modal-slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hc-modal-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-100);
+  color: var(--gray-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.hc-modal-close:hover {
+  background: var(--gray-100);
+  color: var(--hc-accent);
+}
+
+.hc-modal-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.hc-modal-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: var(--hc-primary-soft);
+  color: var(--hc-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.hc-modal-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--hc-secondary);
+  margin: 0 0 0.5rem 0;
+}
+
+.hc-modal-desc {
+  color: var(--gray-500);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.registration-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.registration-field label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gray-700);
+  margin-bottom: 0.5rem;
+}
+
+.registration-field input,
+.registration-field textarea {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  border: 1px solid var(--gray-200);
+  background: var(--gray-50);
+  font-size: 1rem;
+  transition: all 0.2s;
+  color: var(--gray-900);
+}
+
+.registration-field input:focus {
+  outline: none;
+  border-color: var(--hc-primary);
+  background: white;
+  box-shadow: 0 0 0 4px var(--hc-primary-soft);
+}
+
+.registration-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.registration-btn-confirm {
+  padding: 1.125rem;
+  border-radius: 1.25rem;
+  font-weight: 700;
+  background: var(--hc-primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.registration-btn-confirm:hover {
+  background: var(--hc-secondary);
+  transform: translateY(-2px);
+}
+
+.registration-btn-confirm:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.registration-btn-cancel {
+  padding: 1.125rem;
+  border-radius: 1.25rem;
+  font-weight: 700;
+  background: var(--gray-100);
+  color: var(--gray-700);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.registration-btn-cancel:hover {
+  background: var(--gray-200);
+}
+
+.success-message {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.success-message h4 {
+  color: var(--hc-primary);
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+@keyframes hc-modal-fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes hc-modal-slideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+[data-theme='dark'] .hc-modal-content {
+  background: var(--gray-900);
+  border-color: var(--gray-800);
+}
+
+[data-theme='dark'] .hc-modal-title {
+  color: white;
+}
+
+[data-theme='dark'] .registration-field input {
+  background: var(--gray-800);
+  border-color: var(--gray-700);
+  color: white;
+}
+
+[data-theme='dark'] .hc-modal-close {
+  background: var(--gray-800);
+  border-color: var(--gray-700);
 }

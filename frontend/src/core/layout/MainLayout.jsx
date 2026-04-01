@@ -16,7 +16,6 @@ const domainConfig = {
     color: 'var(--civilian-color)',
     routes: [
       { path: '/dashboard', label: 'Overview', icon: Home },
-      { path: '/profile', label: 'My Account', icon: User },
     ]
   },
   healthcare: {
@@ -33,7 +32,6 @@ const domainConfig = {
           ]
       ),
       { path: '/healthcare/camps', label: 'All Camps', icon: Calendar },
-      { path: '/profile', label: 'My Account', icon: User },
     ]
   },
   municipal: {
@@ -50,7 +48,6 @@ const domainConfig = {
           ]
       ),
       { path: '/municipal/issues', label: 'Issues Map', icon: MapPin },
-      { path: '/profile', label: 'My Account', icon: User },
     ]
   },
   education: {
@@ -67,7 +64,6 @@ const domainConfig = {
           ]
       ),
       { path: '/education/jobs', label: 'All Postings', icon: Search },
-      { path: '/profile', label: 'My Account', icon: User },
     ]
   }
 };
@@ -81,11 +77,15 @@ export function MainLayout({ children }) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   // Determine current domain from URL path
+  // Also check for /chat/:domain routes to preserve sidebar context
   const getActiveDomain = () => {
     const path = location.pathname;
     if (path.startsWith('/healthcare')) return 'healthcare';
     if (path.startsWith('/municipal')) return 'municipal';
     if (path.startsWith('/education')) return 'education';
+    if (path.startsWith('/chat/healthcare')) return 'healthcare';
+    if (path.startsWith('/chat/municipal')) return 'municipal';
+    if (path.startsWith('/chat/education')) return 'education';
     return 'civilian';
   };
 
@@ -102,6 +102,7 @@ export function MainLayout({ children }) {
   };
 
   const isActive = (path) => location.pathname === path;
+
 
   return (
     <div className="layout">
@@ -162,7 +163,7 @@ export function MainLayout({ children }) {
       </header>
 
       {/* Sidebar */}
-      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`} data-domain={activeDomain}>
         <div className="sidebar-header">
           <Link to="/dashboard" className="logo">
             <span className="logo-icon">🏛️</span>
@@ -228,9 +229,13 @@ export function MainLayout({ children }) {
           </div>
         )}
 
-        {/* Logout Section */}
+        {/* Account & Logout Section */}
         <div className="sidebar-footer">
-          <div className="user-info">
+          <Link
+            to="/profile"
+            className={`user-info-link ${isActive('/profile') ? 'active' : ''}`}
+            onClick={() => setSidebarOpen(false)}
+          >
             <div className="user-avatar-sm">
               {user?.profile_picture ? (
                 <img src={user.profile_picture} alt="Avatar" className="avatar-img" />
@@ -242,6 +247,8 @@ export function MainLayout({ children }) {
               <span className="user-name-sm">{user?.full_name}</span>
               <span className="user-role-sm">{user?.role?.replace('_', ' ')}</span>
             </div>
+          </Link>
+          <div className="sidebar-footer-actions">
             <button 
               className="theme-toggle-sidebar" 
               onClick={toggleTheme}
@@ -249,11 +256,10 @@ export function MainLayout({ children }) {
             >
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
+            <button className="logout-btn-compact" onClick={handleLogout} title={t('logout')}>
+              <LogOut size={18} />
+            </button>
           </div>
-          <button className="logout-btn" onClick={handleLogout}>
-            <LogOut size={18} />
-            <span>{t('logout')}</span>
-          </button>
         </div>
       </aside>
 
@@ -264,7 +270,9 @@ export function MainLayout({ children }) {
 
       {/* Main Content */}
       <main className="layout-main">
-        {children}
+        <div className="page-transition-wrapper" key={location.pathname}>
+          {children}
+        </div>
       </main>
     </div>
   );

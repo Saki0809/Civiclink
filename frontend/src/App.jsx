@@ -10,6 +10,7 @@ import { CommunityChatPage } from './pages/community/CommunityChatPage';
 import { MyAccountPage } from './pages/account/MyAccountPage';
 import { HealthcareDashboard } from './modules/healthcare/HealthcareDashboard';
 import { CreateCampPage } from './modules/healthcare/CreateCampPage';
+import { MyRegistrationsPage } from './modules/healthcare/MyRegistrationsPage';
 import { ApplyVolunteerPage } from './modules/healthcare/ApplyVolunteerPage';
 import { MyVolunteerApplicationsPage } from './modules/healthcare/MyVolunteerApplicationsPage';
 import { BloodDonationPage } from './modules/healthcare/BloodDonationPage';
@@ -72,7 +73,8 @@ function AppRoutes() {
                 <Route path="healthcare/camps" element={<HealthcareDashboard />} />
                 <Route path="healthcare/camps/new" element={<CreateCampPage />} />
                 <Route path="healthcare/camps/:id" element={<HealthcareDashboard />} />
-                <Route path="healthcare/my-camps" element={<HealthcareDashboard />} />
+                <Route path="healthcare/my-camps" element={<MyRegistrationsPage />} />
+                <Route path="healthcare/my-registrations" element={<MyRegistrationsPage />} />
                 <Route path="healthcare/volunteer/apply" element={<ApplyVolunteerPage />} />
                 <Route path="healthcare/my-applications" element={<MyVolunteerApplicationsPage />} />
                 <Route path="healthcare/blood-donation" element={<BloodDonationPage />} />

@@ -1,76 +1,111 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, MapPin, Clock, AlertCircle, CheckCircle, Loader, Eye, Calendar, ArrowUpRight } from 'lucide-react';
+import { useAuth } from '../../core/auth/AuthContext';
+import { supabase } from '../../core/api/supabaseClient';
+import { Building2, MapPin, Clock, AlertCircle, CheckCircle, Loader, Eye, Calendar, ArrowUpRight, ShieldAlert } from 'lucide-react';
 import '../DomainDashboard.css';
 import './Municipal.css';
 
 export function MyIssuesPage() {
+  const { user } = useAuth();
   const [filter, setFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [myIssues, setMyIssues] = useState([]);
+  const [expandedIssue, setExpandedIssue] = useState(null);
 
-  // Dummy data for user's submitted issues
-  const myIssues = [
-    { 
-      id: 1, 
-      title: 'Pothole on Main Street', 
-      category: 'roads', 
-      status: 'in_progress', 
-      locality: 'Sector 12', 
-      priority: 'high', 
-      createdAt: '2026-02-03',
-      updatedAt: '2026-02-04',
-      ticketNumber: 'MUN-2026-4521',
-      updates: [
-        { date: '2026-02-04', message: 'Issue assigned to road maintenance team', status: 'in_progress' },
-        { date: '2026-02-03', message: 'Issue acknowledged by municipal office', status: 'acknowledged' },
-        { date: '2026-02-03', message: 'Issue submitted successfully', status: 'submitted' }
-      ]
-    },
-    { 
-      id: 2, 
-      title: 'Street Light Not Working', 
-      category: 'street_lights', 
-      status: 'acknowledged', 
-      locality: 'Park Avenue', 
-      priority: 'medium', 
-      createdAt: '2026-02-04',
-      updatedAt: '2026-02-04',
-      ticketNumber: 'MUN-2026-4532',
-      updates: [
-        { date: '2026-02-04', message: 'Issue acknowledged, scheduled for inspection', status: 'acknowledged' },
-        { date: '2026-02-04', message: 'Issue submitted successfully', status: 'submitted' }
-      ]
-    },
-    { 
-      id: 3, 
-      title: 'Garbage Not Collected for 3 Days', 
-      category: 'garbage', 
-      status: 'resolved', 
-      locality: 'Green Colony', 
-      priority: 'high', 
-      createdAt: '2026-01-28',
-      updatedAt: '2026-01-30',
-      ticketNumber: 'MUN-2026-4102',
-      updates: [
-        { date: '2026-01-30', message: 'Issue resolved - garbage collection completed', status: 'resolved' },
-        { date: '2026-01-29', message: 'Sanitation team dispatched', status: 'in_progress' },
-        { date: '2026-01-28', message: 'Issue submitted successfully', status: 'submitted' }
-      ]
-    },
-    { 
-      id: 4, 
-      title: 'Water Pipeline Leak', 
-      category: 'water_supply', 
-      status: 'submitted', 
-      locality: 'New Town', 
-      priority: 'critical', 
-      createdAt: '2026-02-05',
-      updatedAt: '2026-02-05',
-      ticketNumber: 'MUN-2026-4598',
-      updates: [
-        { date: '2026-02-05', message: 'Issue submitted successfully', status: 'submitted' }
-      ]
+  useEffect(() => {
+    async function fetchIssues() {
+      if (!user) return;
+      
+      let data = [];
+      try {
+        setLoading(true);
+        let query = supabase.from('my_reported_issues').select('*').eq('user_id', user.id);
+        const { data: dbData } = await query.order('created_at', { ascending: false });
+        data = dbData || [];
+      } catch (err) {
+        console.warn('Backend fetch failed for My Issues, using local and baseline data only.', err);
+      }
+
+      // 1. Map database fields to UI fields
+      const formattedDbIssues = data.map(issue => ({
+        id: issue.id,
+        title: issue.title,
+        category: issue.category,
+        status: issue.status || 'submitted',
+        locality: issue.locality,
+        priority: issue.urgency || 'medium',
+        createdAt: issue.created_at,
+        updatedAt: issue.updated_at,
+        ticketNumber: issue.ticket_number,
+        description: issue.description,
+        updates: [
+          { date: issue.created_at, message: 'Issue submitted successfully', status: 'submitted' }
+        ]
+      }));
+
+      // 2. Load Local Storage Issues
+      const localIssues = JSON.parse(localStorage.getItem('local_municipal_issues') || '[]')
+        .filter(i => !user || i.citizen_id === user.id)
+        .map(issue => ({
+          ...issue,
+          id: issue.id,
+          updates: [{ date: issue.createdAt, message: 'Local report saved', status: 'submitted' }]
+        }));
+
+      // 3. Robust Baseline Mock Data (Always available)
+      const baselineIssues = [
+        { 
+          id: 'b1', title: 'Road Repair - MG Road', category: 'roads', status: 'in_progress', locality: 'Sector 12', priority: 'high', 
+          createdAt: new Date(Date.now() - 86400000).toISOString(), ticketNumber: 'TKT-1001',
+          description: 'Large potholes reported near the main intersection. High traffic area.', 
+          updates: [
+            { date: new Date(Date.now() - 86400000).toISOString(), message: 'Issue reported', status: 'submitted' },
+            { date: new Date(Date.now() - 43200000).toISOString(), message: 'Officer assigned for inspection', status: 'acknowledged' },
+            { date: new Date(Date.now() - 3600000).toISOString(), message: 'Repair work started', status: 'in_progress' }
+          ] 
+        },
+        { 
+          id: 'b2', title: 'Street Light Failure', category: 'street_lights', status: 'submitted', locality: 'Old Town', priority: 'medium', 
+          createdAt: new Date(Date.now() - 172800000).toISOString(), ticketNumber: 'TKT-1002',
+          description: 'Three street lights not working in row near the clock tower.', 
+          updates: [{ date: new Date(Date.now() - 172800000).toISOString(), message: 'Ticket generated', status: 'submitted' }] 
+        },
+        { 
+          id: 'b3', title: 'Garbage Overflow', category: 'garbage', status: 'acknowledged', locality: 'Block C', priority: 'critical', 
+          createdAt: new Date(Date.now() - 259200000).toISOString(), ticketNumber: 'TKT-1003',
+          description: 'Main garbage collection point has not been cleared for 3 days.', 
+          updates: [
+            { date: new Date(Date.now() - 259200000).toISOString(), message: 'Cleanup request received', status: 'submitted' },
+            { date: new Date(Date.now() - 86400000).toISOString(), message: 'Sanitation team notified', status: 'acknowledged' }
+          ] 
+        },
+        { 
+          id: 'b4', title: 'Water Leakage', category: 'water_supply', status: 'resolved', locality: 'Green Park', priority: 'high', 
+          createdAt: new Date(Date.now() - 345600000).toISOString(), ticketNumber: 'TKT-1004',
+          description: 'Continuous water leakage from main supply pipe near the entrance.', 
+          updates: [
+            { date: new Date(Date.now() - 345600000).toISOString(), message: 'Repaired successfully', status: 'resolved' }
+          ] 
+        },
+        { 
+          id: 'b6', title: 'Drainage Blockage', category: 'drainage', status: 'submitted', locality: 'Housing Colony', priority: 'high', 
+          createdAt: new Date(Date.now() - 518400000).toISOString(), ticketNumber: 'TKT-1006',
+          description: 'Sewer line blockage causing overflow on the main street.', 
+          updates: [{ date: new Date(Date.now() - 518400000).toISOString(), message: 'Urgent request submitted', status: 'submitted' }] 
+        },
+      ];
+
+      // 4. Merge all
+      const combined = [...localIssues, ...formattedDbIssues, ...baselineIssues]
+        .sort((a, b) => new Date(b.createdAt || b.created_at) - new Date(a.createdAt || a.created_at));
+
+      setMyIssues(combined);
+      setLoading(false);
     }
-  ];
+
+    fetchIssues();
+  }, [user]);
 
   const statusConfig = {
     submitted: { label: 'Submitted', color: 'var(--gray-500)', icon: Clock },
@@ -89,8 +124,6 @@ export function MyIssuesPage() {
   const filteredIssues = filter === 'all' 
     ? myIssues 
     : myIssues.filter(issue => issue.status === filter);
-
-  const [expandedIssue, setExpandedIssue] = useState(null);
 
   return (
     <div className="domain-dashboard">
@@ -158,9 +191,14 @@ export function MyIssuesPage() {
       </div>
 
       {/* Issues List */}
-      <div className="my-issues-list">
-        {filteredIssues.map(issue => {
-          const StatusIcon = statusConfig[issue.status].icon;
+      <div className="my-issues-list report-list-premium">
+        {loading ? (
+          <div className="loading-state">
+            <Loader size={40} className="spin" />
+            <p>Fetching your reports...</p>
+          </div>
+        ) : filteredIssues.map(issue => {
+          const StatusIcon = statusConfig[issue.status]?.icon || Clock;
           const isExpanded = expandedIssue === issue.id;
           
           return (
@@ -220,18 +258,19 @@ export function MyIssuesPage() {
             </div>
           );
         })}
+        {!loading && filteredIssues.length === 0 && (
+          <div className="empty-state-premium">
+            <div className="empty-icon-wrapper">
+              <ShieldAlert size={48} />
+            </div>
+            <h3>No reports found</h3>
+            <p>You haven't reported any issues in this category yet.</p>
+            <Link to="/municipal/issues/new" className="btn btn-primary btn-lg">
+              Report an Issue
+            </Link>
+          </div>
+        )}
       </div>
-
-      {filteredIssues.length === 0 && (
-        <div className="empty-state">
-          <Building2 size={48} />
-          <h3>No issues found</h3>
-          <p>You haven't reported any issues in this category yet.</p>
-          <Link to="/municipal/issues/new" className="btn btn-primary">
-            Report an Issue
-          </Link>
-        </div>
-      )}
     </div>
   );
 }

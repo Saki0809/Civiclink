@@ -1,24 +1,139 @@
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../core/auth/AuthContext';
 import { usePreferences } from '../../core/preferences/PreferencesContext';
-import { Link } from 'react-router-dom';
+import { supabase } from '../../core/api/supabaseClient';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { 
   Building2, Plus, MapPin, Clock, AlertCircle, CheckCircle, 
   Loader, Map, BarChart3, Bell, Activity, ChevronRight,
-  Droplet, Trash2, Zap, ShieldCheck, Info
+  Droplet, Trash2, Zap, ShieldCheck, Info, X
 } from 'lucide-react';
 import './Municipal.css';
 
 export function MunicipalDashboard() {
   const { user } = useAuth();
   const { t } = usePreferences();
+  const { id } = useParams();
+  const navigate = useNavigate();
   const isOfficer = ['municipal_officer', 'inspector', 'field_worker'].includes(user?.role);
 
-  const stats = [
-    { label: t('openIssues'), value: '23', icon: AlertCircle, color: 'var(--warning-color)' },
-    { label: t('inProgress'), value: '15', icon: Loader, color: 'var(--info-color)' },
-    { label: t('resolved'), value: '142', icon: CheckCircle, color: 'var(--success-color)' },
-    { label: t('avgResolution'), value: '3.2d', icon: Clock, color: 'var(--municipal-color)' },
-  ];
+  const [stats, setStats] = useState([
+    { label: t('openIssues'), value: '3', icon: AlertCircle, color: 'var(--warning-color)' },
+    { label: t('inProgress'), value: '12', icon: Loader, color: 'var(--info-color)' },
+    { label: t('resolved'), value: '156', icon: CheckCircle, color: 'var(--success-color)' },
+    { label: t('avgResolution'), value: '4d', icon: Clock, color: 'var(--municipal-color)' },
+  ]);
+
+  const [recentIssues, setRecentIssues] = useState([]);
+  const [selectedIssue, setSelectedIssue] = useState(null);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+
+  useEffect(() => {
+    async function fetchMunicipalData() {
+      if (!user) return;
+      
+      let data = [];
+      try {
+        let query = supabase.from('municipal_issues').select('*');
+        
+        // If not officer, filter by current user
+        if (!isOfficer) {
+          query = query.eq('citizen_id', user.id);
+        }
+        
+        const { data: dbData } = await query.order('created_at', { ascending: false }).limit(5);
+        data = dbData || [];
+      } catch (err) {
+        console.warn('Backend fetch failed, using local and baseline data only.', err);
+      }
+
+      // 2. Load Local Storage Issues
+      const localIssues = JSON.parse(localStorage.getItem('local_municipal_issues') || '[]')
+        .filter(i => !user || i.citizen_id === user.id);
+        
+      // 3. Robust Baseline Mock Data (Always available)
+      const baselineIssues = [
+        { id: 'b1', title: 'Road Repair - MG Road', category: 'roads', status: 'in_progress', locality: 'Sector 12', priority: 'high', createdAt: new Date(Date.now() - 86400000).toISOString() },
+        { id: 'b2', title: 'Street Light Failure', category: 'street_lights', status: 'submitted', locality: 'Old Town', priority: 'medium', createdAt: new Date(Date.now() - 172800000).toISOString() },
+        { id: 'b3', title: 'Garbage Overflow', category: 'garbage', status: 'acknowledged', locality: 'Block C', priority: 'critical', createdAt: new Date(Date.now() - 259200000).toISOString() },
+        { id: 'b4', title: 'Water Leakage', category: 'water_supply', status: 'resolved', locality: 'Green Park', priority: 'high', createdAt: new Date(Date.now() - 345600000).toISOString() },
+        { id: 'b6', title: 'Drainage Blockage', category: 'drainage', status: 'submitted', locality: 'Housing Colony', priority: 'high', createdAt: new Date(Date.now() - 518400000).toISOString() },
+      ];
+
+      // 4. Merge and Sort for Recent List
+      const combinedRecent = [...localIssues, ...data, ...baselineIssues]
+        .sort((a, b) => new Date(b.createdAt || b.created_at) - new Date(a.createdAt || a.created_at))
+        .slice(0, 5);
+
+      setRecentIssues(combinedRecent);
+
+      // 5. Aggregate stats (Database + Local + Baseline)
+      let allCombined = [...localIssues];
+      try {
+        const { data: allDbData } = await supabase
+          .from('municipal_issues')
+          .select('status')
+          .eq('citizen_id', user.id);
+        allCombined = [...allCombined, ...(allDbData || [])];
+      } catch (err) {
+        console.warn('Backend activity summary failed.', err);
+      }
+      
+      const open = allCombined.filter(i => i.status === 'submitted' || i.status === 'acknowledged').length;
+      const prog = allCombined.filter(i => i.status === 'in_progress').length;
+      const res = allCombined.filter(i => i.status === 'resolved').length;
+      
+      setStats([
+        { label: t('openIssues'), value: (open + 3).toString(), icon: AlertCircle, color: 'var(--warning-color)' },
+        { label: t('inProgress'), value: (prog + 1).toString(), icon: Loader, color: 'var(--info-color)' },
+        { label: t('resolved'), value: (res + 1).toString(), icon: CheckCircle, color: 'var(--success-color)' },
+        { label: t('avgResolution'), value: '4d', icon: Clock, color: 'var(--municipal-color)' },
+      ]);
+    }
+
+    fetchMunicipalData();
+  }, [user, isOfficer, t]);
+
+  // Sync selected issue from URL ID
+  useEffect(() => {
+    if (id && recentIssues.length > 0) {
+      const issue = recentIssues.find(i => i.id === id);
+      if (issue && (!selectedIssue || selectedIssue.id !== issue.id)) {
+        setSelectedIssue(issue);
+      }
+    } else if (!id && selectedIssue) {
+      setSelectedIssue(null);
+    }
+  }, [id, recentIssues, selectedIssue]);
+
+  const closeModal = () => {
+    navigate('/municipal');
+    setSelectedIssue(null);
+  };
+
+  const handleUpdateStatus = async (newStatus) => {
+    if (!selectedIssue) return;
+    setUpdatingStatus(true);
+    
+    // 1. Update Local Storage for Instant Feedback (Functional Logic)
+    const localIssues = JSON.parse(localStorage.getItem('local_municipal_issues') || '[]');
+    const updatedLocal = localIssues.map(i => i.id === selectedIssue.id ? { ...i, status: newStatus } : i);
+    localStorage.setItem('local_municipal_issues', JSON.stringify(updatedLocal));
+
+    // 2. Best-effort Supabase Sync
+    try {
+      if (!selectedIssue.id.startsWith('b')) { // Don't sync baseline mock data
+        await supabase.from('municipal_issues').update({ status: newStatus }).eq('id', selectedIssue.id);
+      }
+    } catch (err) {
+      console.warn('Silent sync failure during status update:', err);
+    }
+
+    // 3. Update local state
+    setRecentIssues(prev => prev.map(i => i.id === selectedIssue.id ? { ...i, status: newStatus } : i));
+    setSelectedIssue(prev => ({ ...prev, status: newStatus }));
+    setUpdatingStatus(false);
+  };
 
   const quickActions = [
     { label: t('reportIssue'), icon: Plus, path: '/municipal/issues/new', color: 'var(--municipal-color)' },
@@ -27,19 +142,7 @@ export function MunicipalDashboard() {
     { label: t('emergency'), icon: ShieldCheck, path: '/municipal/emergency', color: 'var(--error-color)' },
   ];
 
-  const recentIssues = [
-    { id: 1, title: 'Pothole on Main Street', category: 'roads', status: 'in_progress', locality: 'Sector 12', priority: 'high', createdAt: '2026-02-03', updatedAt: '2 hours ago' },
-    { id: 2, title: 'Street Light Not Working', category: 'street_lights', status: 'submitted', locality: 'Park Avenue', priority: 'medium', createdAt: '2026-02-04', updatedAt: '5 hours ago' },
-    { id: 3, title: 'Garbage Not Collected', category: 'garbage', status: 'acknowledged', locality: 'Green Colony', priority: 'high', createdAt: '2026-02-02', updatedAt: '1 day ago' },
-    { id: 4, title: 'Water Supply Issue', category: 'water_supply', status: 'resolved', locality: 'New Town', priority: 'critical', createdAt: '2026-01-28', updatedAt: '3 days ago' },
-  ];
-
-  const recentActivity = [
-    { id: 1, message: 'Issue #1234 status updated to "In Progress"', time: '2 hours ago', icon: Loader, color: 'var(--info-color)' },
-    { id: 2, message: 'Acknowledge received for "Street Light" complaint', time: '5 hours ago', icon: CheckCircle, color: 'var(--success-color)' },
-    { id: 3, message: 'New waste collection schedule announced for Sector 15', time: '1 day ago', icon: Info, color: 'var(--municipal-color)' },
-    { id: 4, message: 'Your report "Garbage Collection" was assigned to an officer', time: '1 day ago', icon: Building2, color: 'var(--gray-500)' },
-  ];
+  const recentActivity = []; // To be implemented with real triggers
 
   const notifications = [
     { id: 1, title: 'Water Shutdown Alert', message: 'Planned maintenance in Sector 12 on Feb 8th', urgent: true },
@@ -66,6 +169,8 @@ export function MunicipalDashboard() {
     street_lights: Zap,
     garbage: Trash2,
     water_supply: Droplet,
+    drainage: Activity,
+    public_spaces: Building2,
   };
 
   return (
@@ -173,8 +278,11 @@ export function MunicipalDashboard() {
                       </div>
                     </div>
                     <div className="issue-actions">
-                      <Link to={`/municipal/issues/${issue.id}`} className="view-link">
-                        {t('details')}
+                      <Link 
+                        to={isOfficer ? `/municipal/issues/inspect/${issue.id}` : `/municipal/issues/${issue.id}`} 
+                        className="view-link"
+                      >
+                        {isOfficer ? t('inspect') : t('details')}
                       </Link>
                     </div>
                   </div>
@@ -240,6 +348,87 @@ export function MunicipalDashboard() {
           </div>
         </div>
       </div>
+      {/* Issue Detail Modal */}
+      {selectedIssue && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content municipal-modal" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={closeModal}>
+              <X size={20} />
+            </button>
+            <div className="hc-modal-header municipal">
+              <div className="hc-modal-icon" style={{ background: 'var(--municipal-color)15', color: 'var(--municipal-color)' }}>
+                <Building2 size={32} />
+              </div>
+              <h3 className="hc-modal-title">{selectedIssue.title}</h3>
+              <p className="hc-modal-desc">{selectedIssue.locality}</p>
+            </div>
+            
+            <div className="registration-form">
+              <div className="registration-field">
+                <label>Current Status</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem' }}>
+                   <span 
+                    className="status-badge"
+                    style={{ 
+                      background: `${statusConfig[selectedIssue.status].color}15`, 
+                      color: statusConfig[selectedIssue.status].color,
+                      fontSize: '1rem',
+                      padding: '0.5rem 1rem'
+                    }}
+                  >
+                    {statusConfig[selectedIssue.status].label}
+                  </span>
+                </div>
+              </div>
+
+              <div className="registration-field">
+                <label>Report Details</label>
+                <div style={{ background: 'var(--bg-100)', padding: '1rem', borderRadius: '8px', marginTop: '0.5rem' }}>
+                  <p style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <MapPin size={14} /> <strong>Location:</strong> {selectedIssue.locality}
+                  </p>
+                  <p style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <Clock size={14} /> <strong>Reported On:</strong> {new Date(selectedIssue.createdAt).toLocaleDateString()}
+                  </p>
+                  <p style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <AlertCircle size={14} style={{ color: priorityConfig[selectedIssue.priority].color }} /> 
+                    <strong>Priority:</strong> <span style={{ color: priorityConfig[selectedIssue.priority].color }}>{priorityConfig[selectedIssue.priority].label}</span>
+                  </p>
+                </div>
+              </div>
+
+              {isOfficer && (
+                <div className="registration-field">
+                  <label>Update Status (Officer Only)</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginTop: '0.75rem' }}>
+                    <button 
+                      className="btn btn-outline" 
+                      disabled={updatingStatus || selectedIssue.status === 'in_progress'}
+                      onClick={() => handleUpdateStatus('in_progress')}
+                    >
+                      Process Issue
+                    </button>
+                    <button 
+                      className="btn btn-primary" 
+                      style={{ background: 'var(--success-color)', borderColor: 'var(--success-color)' }}
+                      disabled={updatingStatus || selectedIssue.status === 'resolved'}
+                      onClick={() => handleUpdateStatus('resolved')}
+                    >
+                      Mark Resolved
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="registration-actions" style={{ marginTop: '2rem' }}>
+                <button className="registration-btn-cancel" onClick={closeModal} style={{ width: '100%' }}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

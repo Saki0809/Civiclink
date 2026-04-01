@@ -206,7 +206,10 @@
   background: #fee2e2;
 }
 
-/* Sidebar */
+/* ================================================
+   SIDEBAR
+   ================================================ */
+
 .sidebar {
   position: fixed;
   top: 0;
@@ -286,11 +289,56 @@
   color: var(--gray-900);
 }
 
+/* Default active: use primary */
 .nav-link.active {
   background: var(--primary-50);
   color: var(--primary-700);
   font-weight: 500;
 }
+
+/* ---- Domain-Specific Active States ---- */
+
+/* Civilian (blue) */
+.sidebar[data-domain="civilian"] .nav-link.active {
+  background: var(--civilian-light);
+  color: var(--civilian-color);
+}
+.sidebar[data-domain="civilian"] .sidebar-domain {
+  border-color: var(--civilian-color);
+  background: rgba(37, 99, 235, 0.04);
+}
+
+/* Healthcare (green) */
+.sidebar[data-domain="healthcare"] .nav-link.active {
+  background: var(--healthcare-light);
+  color: #166534;
+}
+.sidebar[data-domain="healthcare"] .sidebar-domain {
+  border-color: var(--healthcare-color);
+  background: rgba(16, 185, 129, 0.04);
+}
+
+/* Municipal (orange) */
+.sidebar[data-domain="municipal"] .nav-link.active {
+  background: var(--municipal-light);
+  color: #9a3412;
+}
+.sidebar[data-domain="municipal"] .sidebar-domain {
+  border-color: var(--municipal-color);
+  background: rgba(245, 158, 11, 0.04);
+}
+
+/* Education (yellow) */
+.sidebar[data-domain="education"] .nav-link.active {
+  background: var(--education-light);
+  color: #854d0e;
+}
+.sidebar[data-domain="education"] .sidebar-domain {
+  border-color: var(--education-color);
+  background: rgba(202, 138, 4, 0.04);
+}
+
+/* ---- Sidebar Sections ---- */
 
 .sidebar-section {
   padding: var(--spacing-md);
@@ -335,20 +383,53 @@
   color: white;
 }
 
-/* Sidebar Footer */
+/* ================================================
+   SIDEBAR FOOTER — Account & Actions
+   ================================================ */
+
 .sidebar-footer {
   margin-top: auto;
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
   border-top: 1px solid var(--gray-100);
   background: var(--gray-50);
 }
 
-.user-info {
+/* Clickable account link */
+.user-info-link {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-  padding: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-sm);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  margin-bottom: var(--spacing-xs);
+}
+
+.user-info-link:hover {
+  background: var(--gray-100);
+  transform: translateX(2px);
+}
+
+.user-info-link.active {
+  background: var(--primary-50);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Domain-specific account link active states */
+.sidebar[data-domain="civilian"] .user-info-link.active {
+  background: var(--civilian-light);
+}
+.sidebar[data-domain="healthcare"] .user-info-link.active {
+  background: var(--healthcare-light);
+}
+.sidebar[data-domain="municipal"] .user-info-link.active {
+  background: var(--municipal-light);
+}
+.sidebar[data-domain="education"] .user-info-link.active {
+  background: var(--education-light);
 }
 
 .user-avatar-sm {
@@ -363,6 +444,7 @@
   font-size: 1rem;
   border-radius: var(--radius-full);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .user-details {
@@ -387,12 +469,20 @@
   text-transform: capitalize;
 }
 
+/* Footer actions row */
+.sidebar-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 0 var(--spacing-xs);
+}
+
 .theme-toggle-sidebar {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-md);
   border: 1px solid var(--gray-200);
   background: var(--gray-50);
@@ -408,26 +498,25 @@
   border-color: var(--primary-300);
 }
 
-.logout-btn {
+.logout-btn-compact {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-sm);
-  width: 100%;
-  padding: var(--spacing-md);
-  background: var(--gray-100);
+  width: 36px;
+  height: 36px;
+  background: var(--gray-50);
   color: var(--error-color);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-md);
-  font-size: 0.875rem;
-  font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
+  flex-shrink: 0;
 }
 
-.logout-btn:hover {
+.logout-btn-compact:hover {
   background: #fee2e2;
   border-color: var(--error-color);
+  transform: translateY(-1px);
 }
 
 /* Main Content */
@@ -508,4 +597,195 @@
   color: var(--gray-500);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+/* ================================================
+   PAGE TRANSITIONS — Buttery Smooth
+   ================================================ */
+
+/* Page content transition on route change */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition-wrapper {
+  animation: pageEnter 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
+}
+
+/* Smooth sidebar color transitions */
+.sidebar {
+  transition: transform var(--transition-normal), border-color 0.4s ease;
+}
+
+.sidebar-domain {
+  transition: border-color 0.4s ease, background 0.4s ease, color 0.3s ease;
+}
+
+.sidebar-domain svg {
+  transition: color 0.4s ease;
+}
+
+/* Smooth nav link transitions */
+.nav-link {
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: background, color, transform;
+}
+
+.nav-link:hover {
+  transform: translateX(4px);
+}
+
+.nav-link.active {
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateX(4px);
+}
+
+/* Domain switcher smooth transitions */
+.domain-link {
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: background, color, transform, box-shadow;
+}
+
+.domain-link:hover {
+  transform: scale(1.1);
+}
+
+.domain-link.active {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* User info link smooth */
+.user-info-link {
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Sidebar footer actions */
+.theme-toggle-sidebar,
+.logout-btn-compact {
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Mobile sidebar overlay transition */
+.sidebar-overlay {
+  animation: overlayFadeIn 0.25s ease-out;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Sidebar open animation on mobile */
+.sidebar.open {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Smooth scrollbar behavior */
+.sidebar-nav {
+  scroll-behavior: smooth;
+}
+
+/* GPU acceleration hints for smooth animations */
+.layout-main {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Section title transitions */
+.section-title {
+  transition: color 0.3s ease;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .page-transition-wrapper {
+    animation: none;
+  }
+
+  .nav-link,
+  .domain-link,
+  .user-info-link,
+  .sidebar-domain {
+    transition-duration: 0.01ms !important;
+  }
+
+  .nav-link:hover,
+  .nav-link.active,
+  .domain-link:hover {
+    transform: none;
+  }
+}
+/* Buttery Smooth Transitions & Global Refinements */
+.page-transition-wrapper {
+  animation: pageFadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.layout-main {
+  scroll-behavior: smooth;
+  transition: padding 0.3s ease;
+}
+
+.nav-link {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-link:hover {
+  background: var(--gray-100);
+  transform: translateX(4px);
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 20px;
+  background: currentColor;
+  border-radius: 0 4px 4px 0;
+}
+
+.domain-link {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.domain-link:hover {
+  transform: scale(1.15) translateY(-2px);
+  box-shadow: 0 8px 15px -3px var(--domain-color);
+}
+
+.domain-link.active {
+  box-shadow: 0 0 15px var(--domain-color);
+  border-width: 2px;
+}
+
+/* Sidebar refinement */
+.sidebar {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 10px 0 30px -10px rgba(0,0,0,0.05);
+}
+
+.sidebar-domain {
+  transition: all 0.3s ease;
+}
+
+.sidebar:hover .sidebar-domain {
+  transform: translateX(2px);
 }

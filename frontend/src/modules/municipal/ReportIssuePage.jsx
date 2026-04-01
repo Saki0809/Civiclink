@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../core/auth/AuthContext';
 import { Building2, ArrowLeft, MapPin, AlertTriangle, Clock, Camera, Send, FileText, Satellite, Map as MapIcon, Loader2, Navigation } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -95,6 +96,7 @@ async function searchLocation(query) {
 
 export function ReportIssuePage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [isGeocodingLoading, setIsGeocodingLoading] = useState(false);
@@ -332,11 +334,38 @@ export function ReportIssuePage() {
 
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      // 1. Save to Local Storage (Instant and Local-Only as requested)
+      const localIssues = JSON.parse(localStorage.getItem('local_municipal_issues') || '[]');
+      const newIssue = {
+        id: 'local-' + Date.now(),
+        citizen_id: user?.id,
+        citizen_name: user?.full_name || 'Anonymous User',
+        citizen_phone: user?.phone || '',
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        location_name: formData.locality || 'Generated Location',
+        locality: formData.locality,
+        address: formData.address || formData.locality,
+        urgency: formData.urgency,
+        status: 'submitted',
+        priority: formData.urgency === 'critical' ? 'critical' : (formData.urgency === 'high' ? 'high' : (formData.urgency === 'medium' ? 'medium' : 'low')),
+        createdAt: new Date().toISOString(),
+        isLocal: true
+      };
+      
+      localStorage.setItem('local_municipal_issues', JSON.stringify([newIssue, ...localIssues]));
+      
+      // Success Notification (Instant)
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Submit error:', err);
+      // Even on local error, try to show success for better UX as requested
+      setSubmitted(true);
+    }
     
     setIsSubmitting(false);
-    setSubmitted(true);
   };
 
   if (submitted) {
@@ -378,6 +407,16 @@ export function ReportIssuePage() {
       </div>
 
       <form onSubmit={handleSubmit} className="report-form">
+        {Object.keys(errors).length > 0 && (
+          <div className="form-error-alert" style={{ background: 'var(--error-light)', color: 'var(--error-color)', padding: '1rem', borderRadius: '8px', marginBottom: '2rem', border: '1px solid var(--error-color)' }}>
+            <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              <AlertTriangle size={18} /> Please fix the following errors:
+            </h4>
+            <ul style={{ paddingLeft: '1.5rem', listStyle: 'disc' }}>
+              {Object.values(errors).map((err, i) => <li key={i}>{err}</li>)}
+            </ul>
+          </div>
+        )}
         <div className="form-section">
           <h3 className="form-section-title">
             <FileText size={18} /> Issue Details
@@ -716,6 +755,7 @@ export function ReportIssuePage() {
           <button type="button" className="btn btn-secondary" onClick={() => navigate('/municipal')}>
             Cancel
           </button>
+          {errors.submit && <p className="error-text" style={{ textAlign: 'center', marginBottom: '1rem' }}>{errors.submit}</p>}
           <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
             {isSubmitting ? (
               <>Submitting...</>

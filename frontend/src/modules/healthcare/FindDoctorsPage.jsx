@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../core/auth/AuthContext';
 import { 
   Stethoscope, Search, MapPin, Star, ChevronLeft, 
   Clock, Calendar, Filter, Phone, CheckCircle, Video
@@ -9,8 +10,10 @@ import './Healthcare.css';
 
 export function FindDoctorsPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isInstitution = ['hospital_admin', 'medical_ngo', 'health_department'].includes(user?.role);
   const [searchQuery, setSearchQuery] = useState('');
-  const [bookingState, setBookingState] = useState('idle'); // 'idle' | 'booking' | 'success'
+  const [bookingState, setBookingState] = useState('idle');
   const [activeDoctor, setActiveDoctor] = useState(null);
 
   const doctors = [
@@ -71,7 +74,7 @@ export function FindDoctorsPage() {
           </button>
           <div>
             <h1 className="page-title">Find Doctors</h1>
-            <p className="page-description">Consult with top-rated specialists in your area</p>
+            <p className="page-description">{isInstitution ? 'View and manage affiliated doctors and specialists' : 'Consult with top-rated specialists in your area'}</p>
           </div>
         </div>
       </div>
@@ -122,24 +125,36 @@ export function FindDoctorsPage() {
                   </div>
                 </div>
                 <div className="dr-actions">
-                  <button className="btn btn-outline btn-sm mb-xs"><Video size={14} /> Video Call</button>
-                  <button 
-                    className="btn-book-premium"
-                    onClick={() => handleBookDoctor(dr)}
-                    disabled={bookingState === 'booking'}
-                  >
-                    {bookingState === 'booking' && activeDoctor?.id === dr.id ? (
-                      <>
-                        <Clock size={18} className="loading-spinner" />
-                        Processing...
-                      </>
-                    ) : (
-                      <>
+                  {isInstitution ? (
+                    <>
+                      <button className="btn btn-outline btn-sm mb-xs"><Phone size={14} /> Contact</button>
+                      <button className="btn-book-premium">
                         <Stethoscope size={18} />
-                        Book Appointment
-                      </>
-                    )}
-                  </button>
+                        View Profile
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button className="btn btn-outline btn-sm mb-xs"><Video size={14} /> Video Call</button>
+                      <button 
+                        className="btn-book-premium"
+                        onClick={() => handleBookDoctor(dr)}
+                        disabled={bookingState === 'booking'}
+                      >
+                        {bookingState === 'booking' && activeDoctor?.id === dr.id ? (
+                          <>
+                            <Clock size={18} className="loading-spinner" />
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <Stethoscope size={18} />
+                            Book Appointment
+                          </>
+                        )}
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
@@ -187,7 +202,7 @@ export function FindDoctorsPage() {
                 </div>
                 <div className="ticket-row">
                   <span className="ticket-label">Booking ID</span>
-                  <span className="ticket-value">#DR-{activeDoctor?.id}{Date.now().toString().slice(-4)}</span>
+                  <span className="ticket-value">#DR-{activeDoctor?.id}2026</span>
                 </div>
                 <div className="ticket-row">
                   <span className="ticket-label">Fee</span>
